@@ -1,0 +1,44 @@
+{
+    "currency": [
+        "long_name",
+        "short_name"
+    ],
+    "work_category": [
+        "name",
+        "color"
+    ],
+    "work_company": [
+        "name",
+        "color",
+        "contract_from",
+        "contract_to",
+        "salary_type",
+        "salary",
+        "currency_id",
+        "type",
+        "contact_name",
+        "contact_phone",
+        "contact_address",
+        "contact_other"
+    ],
+    "work_hours": [
+        "start_date",
+        "start",
+        "end",
+        "description",
+        "attachment",
+        "work_category_id",
+        "work_company_id",
+        "work_project_id",
+        "deleted",
+        "invoiced"
+    ],
+    "work_project": [
+        "name",
+        "start",
+        "deadline",
+        "description",
+        "notes",
+        "work_company_id"
+    ]
+}

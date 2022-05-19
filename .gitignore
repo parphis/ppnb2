@@ -1,0 +1,4 @@
+vendor/*
+db/*.yaml
+db/*.sql
+db/*.sqlite
