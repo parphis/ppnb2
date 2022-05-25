@@ -65,6 +65,14 @@ function markAsDeleted($request, $response, $table, $id) {
     return $response;
 }
 
+$app->get('/work_hours/{from}/{to}/{company_id}', function(Request $request, Response $response, $args) {
+    $ppnbdb = new PPNBDB();
+    $ppnbdb->connect();
+            
+    $response->getBody()->write($ppnbdb->getWorkhoursByIntervalByCompany($args['from'], $args['to'], $args['company_id']));
+    return $response;
+});
+
 $app->get('/work_hours', function(Request $request, Response $response, $args) {
     $ppnbdb = new PPNBDB();
     $ppnbdb->connect();

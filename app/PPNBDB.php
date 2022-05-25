@@ -174,6 +174,47 @@ final class PPNBDB {
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
+
+    public function getWorkhoursByIntervalByCompany($from, $to, $company_id) {
+        $sql = $this->pdo->query("
+    select
+          w.start_date
+        , w.start
+        , w.end
+        , cast (
+                (
+                    strftime('%s', w.end) - strftime('%s', w.start)
+                ) as real
+            )/60/60
+        , w.description
+        , c.name
+        , p.name
+        , w.attachment
+        , w.work_category_id
+        , w.work_company_id
+        , w.work_project_id
+    from
+        work_hours w
+        left join work_project p on w.work_project_id = p.id
+        left join work_company c on w.work_company_id = c.id
+    where
+            w. deleted = 0
+        and w.start_date >= Datetime('2022-03-01')
+        and w.start_date <= Datetime('2022-05-30')
+        and c.id = 9
+    order by
+          w.start_date desc
+        , w.start desc
+    ");
+        $stmt = $this->pdo->prepare($sql);
+        /*$stmt->bindParam(':from', '2022-03-01');
+        $stmt->bindParam(':to', '2022-03-30');
+        $stmt->bindParam(':company_id', 7);*/
+        
+        $results = $stmt->execute();
+        print_r($results);
+        return json_encode($results, JSON_UNESCAPED_UNICODE);
+    }
     
     public function getCurrencies() {
         $stmt = $this->pdo->query('select * from currency where deleted = 0');
