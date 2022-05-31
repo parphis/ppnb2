@@ -170,54 +170,80 @@ final class PPNBDB {
     }
 
     public function getWorkhours() {
-        $stmt = $this->pdo->query('select * from work_hours where deleted = 0 order by start_date desc');
+        $stmt = $this->pdo->query("
+    select 
+          w.id as id
+        , w.start_date as start_date
+        , w.start as start
+        , w.end as end
+        , w.description as description
+        , w.attachment as attachment
+        , wc.name as work_category
+        , c.name as work_company
+        , p.name as work_project
+    from
+        work_hours w
+        left join work_category wc on w.work_category_id = wc.id
+        left join work_project p on w.work_project_id = p.id
+        left join work_company c on w.work_company_id = c.id
+    where w.deleted = 0 order by w.start_date desc
+    ");
+
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
 
     public function getWorkhoursByIntervalByCompany($from, $to, $company_id) {
-        $sql = $this->pdo->query("
+        $sql = "
     select
-          w.start_date
-        , w.start
-        , w.end
+          w.start_date as start_date
+        , w.start as start
+        , w.end as end
         , cast (
                 (
                     strftime('%s', w.end) - strftime('%s', w.start)
                 ) as real
-            )/60/60
-        , w.description
-        , c.name
-        , p.name
-        , w.attachment
-        , w.work_category_id
-        , w.work_company_id
-        , w.work_project_id
+            )/60/60 as amount
+        , w.description as description
+        , c.name as work_company
+        , p.name as work_project
     from
         work_hours w
         left join work_project p on w.work_project_id = p.id
         left join work_company c on w.work_company_id = c.id
     where
             w. deleted = 0
-        and w.start_date >= Datetime('2022-03-01')
-        and w.start_date <= Datetime('2022-05-30')
-        and c.id = 9
+        and w.start_date >= Datetime(:from)
+        and w.start_date <= Datetime(:to)
+        and c.id = :company_id
     order by
           w.start_date desc
         , w.start desc
-    ");
+    ";
         $stmt = $this->pdo->prepare($sql);
-        /*$stmt->bindParam(':from', '2022-03-01');
-        $stmt->bindParam(':to', '2022-03-30');
-        $stmt->bindParam(':company_id', 7);*/
-        
-        $results = $stmt->execute();
-        print_r($results);
+        $stmt->bindParam(':from', $from);
+        $stmt->bindParam(':to', $to);
+        $stmt->bindParam(':company_id', $company_id);
+        try {
+            if (!$stmt->execute()) {
+                error_log($stmt->errorInfo());
+            }
+        }
+        catch (PDOException $e) {
+            error_log($e);
+            return null;
+        }
+        catch (Exception $e) {
+            error_log($e);
+            return null;
+        }
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        #print_r($results);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
     
     public function getCurrencies() {
-        $stmt = $this->pdo->query('select * from currency where deleted = 0');
+        $stmt = $this->pdo->query('select * from currency where deleted = 0 order by id');
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
@@ -229,19 +255,19 @@ final class PPNBDB {
     }
 
     public function getWorkcategory() {
-        $stmt = $this->pdo->query('select * from work_category where deleted = 0');
+        $stmt = $this->pdo->query('select * from work_category where deleted = 0 order by id');
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
 
     public function getWorkcompany() {
-        $stmt = $this->pdo->query('select * from work_company where deleted = 0');
+        $stmt = $this->pdo->query('select * from work_company where deleted = 0 order by id');
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
 
     public function getWorkProject() {
-        $stmt = $this->pdo->query('select * from work_project where deleted = 0');
+        $stmt = $this->pdo->query('select * from work_project where deleted = 0 order by id');
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
