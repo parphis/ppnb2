@@ -65,7 +65,7 @@ function markAsDeleted($request, $response, $table, $id) {
     return $response;
 }
 
-$app->get('/work_hours/{from}/{to}/{company_id}', function(Request $request, Response $response, $args) {
+$app->get('/work_hour/{from}/{to}/{company_id}', function(Request $request, Response $response, $args) {
     $ppnbdb = new PPNBDB();
     $ppnbdb->connect();
             

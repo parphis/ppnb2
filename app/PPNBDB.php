@@ -199,11 +199,7 @@ final class PPNBDB {
           w.start_date as start_date
         , w.start as start
         , w.end as end
-        , cast (
-                (
-                    strftime('%s', w.end) - strftime('%s', w.start)
-                ) as real
-            )/60/60 as amount
+        , printf('%02d', cast((strftime('%s', w.end) - strftime('%s', w.start))/3600 as char)) || ':' || printf('%02d', cast(((strftime('%s', w.end) - strftime('%s', w.start)) - ((strftime('%s', w.end) - strftime('%s', w.start))/3600) *3600)/60 as char)) as amount
         , w.description as description
         , c.name as work_company
         , p.name as work_project
@@ -255,19 +251,19 @@ final class PPNBDB {
     }
 
     public function getWorkcategory() {
-        $stmt = $this->pdo->query('select * from work_category where deleted = 0 order by id');
+        $stmt = $this->pdo->query('select * from work_category order by id');
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
 
     public function getWorkcompany() {
-        $stmt = $this->pdo->query('select * from work_company where deleted = 0 order by id');
+        $stmt = $this->pdo->query('select * from work_company order by id');
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
 
     public function getWorkProject() {
-        $stmt = $this->pdo->query('select * from work_project where deleted = 0 order by id');
+        $stmt = $this->pdo->query('select * from work_project order by id');
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
         return json_encode($results, JSON_UNESCAPED_UNICODE);
     }
